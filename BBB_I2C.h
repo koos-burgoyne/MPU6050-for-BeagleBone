@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define I2C_BUS 1
+#define I2C_BUS 3
 #define PATH_SIZE 15
 
 class BBB_I2C {

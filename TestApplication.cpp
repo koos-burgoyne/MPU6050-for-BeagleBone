@@ -32,61 +32,19 @@
 #include <string>
 #include <unistd.h>
 #include <time.h>
-#include "BBB_I2C.h"
-#include "MPU6050.h"
 
-int16_t ax,ay,az;
-int16_t gx,gy,gz;
+#include "ImuHandler.h"
 
 using namespace std;
 
 int main(int argc, char *argv[]){
-	MPU6050 MPU;
-	BBB_I2C BBB_I2C;
-	uint8_t rxbuf;
-	uint8_t txbuf = 0xaa;
-	uint8_t addr = 0x54;  // i2c slave address for E2PROM A[2:0]=3'b000
-//	uint8_t addr = 0x68;  // i2c slave address for MPU6050
-	uint8_t offset = 0x55;
-	uint8_t bitnum = 0x00;
-	uint8_t DEV_ID;
 	
-	uint8_t bitlength = 0x04;
-	uint8_t bitstart = 0x00;
-	
-	cout << "Testing the MPU6050 00.00.01" << endl;
+	ImuHandler imu;
 
-	if (MPU.testConnection() < 1){
-		printf ("Device ID not match!\n");
-		exit(1);
-	}
+	imu.calibrateImu();
 	
-	if (MPU.initialize() < 1) {
-		printf ("MPU initialize fail!\n");
-		exit(1);
-	}
-	
-	struct timespec start, end, timepcs;
-	clock_gettime( CLOCK_REALTIME, &start );	//must linked with the "librt" library to use these functions
+	imu.read();
 
-//read 1000 times 
-	for(int i=0;i<1000;i++){
-	MPU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
- 	}
-   	clock_gettime( CLOCK_REALTIME, &end );
-     	double difference = (end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec)/1000000000.0d;
-	printf ("Take [ %f ] Sec to finish 1000 times read\n", difference);
-		
-
-// cycle read
-/*	while(1){
-	MPU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    	clock_gettime( CLOCK_REALTIME, &timepcs );
-    	double difference = (timepcs.tv_sec - start.tv_sec) + (double)(timepcs.tv_nsec - start.tv_nsec)/1000000000.0d;
-	printf ("ax\tay\taz\t:\tgx\tgy\tgz [Time:%f Sec]\n", difference);
-	printf ("%d\t%d\t%d\t:\t%d\t%d\t%d\n",ax,ay,az,gx,gy,gz);
-	}
-*/	
 	return 0;
 }
 

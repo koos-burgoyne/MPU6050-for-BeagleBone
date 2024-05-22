@@ -71,8 +71,9 @@ MPU6050::MPU6050(uint8_t address) {
  
 bool MPU6050::initialize() {
     setClockSource(MPU6050_CLOCK_PLL_XGYRO);
-    setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-    setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
+    setFullScaleGyroRange(MPU6050_GYRO_FS_500);
+    setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+    setDLPFMode(MPU6050_DLPF_BW_10);
     setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
     return 1;
 }
@@ -168,6 +169,19 @@ void MPU6050::setFullScaleAccelRange(uint8_t range) {
 void MPU6050::setSleepEnabled(bool enabled) {
     BBB_I2C BBB_I2C;
     BBB_I2C.writeBit(devAddr, MPU6050_RA_PWR_MGMT_1, enabled, MPU6050_PWR1_SLEEP_BIT);
+}
+
+/** Set digital low-pass filter configuration.
+ * @param bandwidth New DLFP configuration setting
+ * @see getDLPFBandwidth()
+ * @see MPU6050_DLPF_BW_256
+ * @see MPU6050_RA_CONFIG
+ * @see MPU6050_CFG_DLPF_CFG_BIT
+ * @see MPU6050_CFG_DLPF_CFG_LENGTH
+ */
+void MPU6050::setDLPFMode(uint8_t bandwidth) {
+    BBB_I2C BBB_I2C;
+    BBB_I2C.writeBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, bandwidth);
 }
 
 /** Get raw 6-axis motion sensor readings (accel/gyro).
